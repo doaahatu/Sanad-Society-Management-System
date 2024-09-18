@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/ADD.css') }}">
+    <title>Add Parent</title>
+
+</head>
+<body>
+<div class="container">
+      <div class="text">
+         Add Parent
+      </div>
+    <form method="post">
+         <div class="form-row">
+            <div class="input-data">
+               <input type="text" id="ssn" name="ssn" required>
+               <div class="underline"></div>
+               <label for="">SSN</label>
+            </div>
+         </div>
+        <div class="form-row">
+            <div class="input-data">
+               <input type="text" id="name" name="name" required>
+               <div class="underline"></div>
+               <label for="">Name</label>
+            </div>
+         </div>
+
+        <br />
+            <div class="form-row submit-btn">
+               <div class="input-data">
+                  <div class="inner"></div>
+                  <input type="submit" value="ADD">
+               </div>
+            </div>
+    </form>
+
+</div>
+</body>
+</html>

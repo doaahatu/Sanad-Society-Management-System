@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+    <link href='https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css' rel='stylesheet'>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payments</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/select.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+    <script>
+        function getCSRFToken() {
+            return $('meta[name=csrf-token]').attr('content');
+        }
+
+        function enableEdit(payment_id) {
+            var row = document.getElementById('row-' + payment_id);
+            row.classList.add('edit-mode');
+
+            document.getElementById('paymentDate-' + payment_id + '-text').style.display = 'none';
+            document.getElementById('paymentDate-' + payment_id + '-input').style.display = 'inline';
+            document.getElementById('amount-' + payment_id + '-text').style.display = 'none';
+            document.getElementById('amount-' + payment_id + '-input').style.display = 'inline';
+            document.getElementById('parent_id-' + payment_id + '-text').style.display = 'none';
+            document.getElementById('parent_id-' + payment_id + '-input').style.display = 'inline';
+            document.getElementById('status-' + payment_id + '-text').style.display = 'none';
+            document.getElementById('status-' + payment_id + '-input').style.display = 'inline';
+
+            document.getElementById('save-btn-' + payment_id).style.display = 'inline';
+            document.getElementById('edit-btn-' + payment_id).style.display = 'none';
+        }
+
+        function saveEdit(payment_id) {
+    var paymentDate = $('#paymentDate-' + payment_id + '-input').val();
+    var amount = $('#amount-' + payment_id + '-input').val();
+    var parent_id = $('#parent_id-' + payment_id + '-input').val();
+    var status = $('#status-' + payment_id + '-input').val();
+
+    console.log('Saving payment:', {
+        paymentDate: paymentDate,
+        amount: amount,
+        parent_id: parent_id,
+        status: status
+    });
+
+    $.ajax({
+        url: '/update_payment/' + payment_id,
+        type: 'POST',
+        data: {
+            paymentDate: paymentDate,
+            amount: amount,
+            parent_id: parent_id,
+            status: status,
+            csrf_token: getCSRFToken()
+        },
+        dataType: 'json',
+        success: function(response) {
+            if (response.success) {
+                $('#paymentDate-' + payment_id + '-text').text(paymentDate).show();
+                $('#amount-' + payment_id + '-text').text(amount).show();
+                $('#parent_id-' + payment_id + '-text').text(parent_id).show();
+                $('#status-' + payment_id + '-text').text(status).show();
+                $('#paymentDate-' + payment_id + '-input').hide();
+                $('#amount-' + payment_id + '-input').hide();
+                $('#parent_id-' + payment_id + '-input').hide();
+                $('#status-' + payment_id + '-input').hide();
+                $('#edit-btn-' + payment_id).show();
+                $('#save-btn-' + payment_id).hide();
+            } else {
+                console.error('Error updating payment:', response.error);
+                alert('Error updating payment: ' + response.error);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error updating payment:', xhr.responseText);
+            alert('Error updating payment: ' + xhr.responseText);
+        }
+    });
+}
+
+
+        function deletePayment(payment_id) {
+            if (confirm('Are you sure you want to delete this payment?')) {
+                $.ajax({
+                    url: '/delete_payment/' + payment_id,
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        csrf_token: getCSRFToken()
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $('#row-' + payment_id).remove();
+                        } else {
+                            console.error('Error deleting payment:', response.error);
+                            alert('Error deleting payment: ' + response.error);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error deleting payment:', xhr.responseText);
+                        alert('Error deleting payment: ' + xhr.responseText);
+                    }
+                });
+            }
+        }
+
+    function searchPayment() {
+        var searchQuery = $('#search-input').val();
+
+        $.ajax({
+            url: '/search_payment',
+            type: 'GET',
+            data: {
+                query: searchQuery
+            },
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    var tbody = $('#keywords tbody');
+                    tbody.empty();
+
+                    response.payments.forEach(function(payment) {
+                        var paymentDate = new Date(payment.PaymentDate);
+                        var formattedPaymentDate = paymentDate.toISOString().split('T')[0];
+                        tbody.append(`
+                            <tr id="row-${payment.PaymentID}">
+                                <td>
+                                    <span id="amount-${payment.PaymentID}-text">${payment.Amount}</span>
+                                    <input type="text" name="amount" id="amount-${payment.PaymentID}-input" value="${payment.Amount}" style="display:none;">
+                                </td>
+                                <td>
+                                    <span id="paymentDate-${payment.PaymentID}-text">${formattedPaymentDate}</span>
+                                    <input type="date" name="paymentDate" id="paymentDate-${payment.PaymentID}-input" value="${formattedPaymentDate}" style="display:none;">
+                                </td>
+                                <td>
+                                    <span id="parent_id-${payment.PaymentID}-text">${payment.Parent_ID}</span>
+                                    <input type="text" name="parent_id" id="parent_id-${payment.PaymentID}-input" value="${payment.Parent_ID}" style="display:none;">
+                                </td>
+                                <td>
+                                    <span id="status-${payment.PaymentID}-text">${payment.PaymentStatus}</span>
+                                    <input type="text" name="status" id="status-${payment.PaymentID}-input" value="${payment.PaymentStatus}" style="display:none;">
+                                </td>
+                                <td>
+                                    <button type="button" id="edit-btn-${payment.PaymentID}" onclick="enableEdit('${payment.PaymentID}')">Edit</button>
+                                    <button type="button" id="save-btn-${payment.PaymentID}" style="display:none;" onclick="saveEdit('${payment.PaymentID}')">Save</button>
+                                    <button type="button" id="delete-btn-${payment.PaymentID}" onclick="deletePayment('${payment.PaymentID}')">Delete</button>
+                                </td>
+                            </tr>
+                        `);
+                    });
+                } else {
+                    console.error('Error searching payments:', response.error);
+                    alert('Error searching payments: ' + response.error);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error searching payments:', xhr.responseText);
+                alert('Error searching payments: ' + xhr.responseText);
+            }
+        });
+    }
+</script>
+
+
+        <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            height: 100vh;
+        }
+        #wrapper {
+            max-width: 800px;
+            width: 100%;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        #search-form, #course-select {
+            margin-bottom: 20px;
+        }
+        #search-query {
+            padding: 10px;
+            width: calc(100% - 20px);
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #course-select {
+            padding: 10px;
+            width: 100%;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+            cursor: pointer;
+            text-align: center;
+        }
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        #total-salary {
+            font-size: 18px;
+            margin-top: 10px;
+            color: #333;
+        }
+        nav {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            background: #333;
+            color: #fff;
+            height: 100vh;
+            padding-top: 20px;
+        }
+        .nav-links {
+            list-style: none;
+            padding: 0;
+        }
+        .nav-links li {
+            padding: 20px;
+            text-align: center;
+        }
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+        }
+        .nav-links a:hover {
+            background: #575757;
+        }
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            width: calc(100% - 250px);
+        }
+        .main-content input {
+            padding: 10px;
+            margin-right: 10px;
+        }
+        .edit, .delete {
+            background-color: #ffcc00;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+        }
+        .edit:hover, .delete:hover {
+            background-color: #ff9900;
+        }
+        #search-bar {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        #search-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px 0 0 5px;
+            font-size: 16px;
+        }
+        #search-input:focus {
+            outline: none;
+        }
+        #search-bar button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            color: white;
+            border-radius: 0 5px 5px 0;
+        }
+    </style>
+
+</head>
+<body>
+<nav class="sidebar close">
+    <header>
+        <div class="image-text">
+            <span class="image">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
+            </span>
+            <div class="text logo-text">
+                <span class="name">SANAD ORG</span>
+            </div>
+        </div>
+        <i class='bx bx-chevron-right toggle'></i>
+    </header>
+    <div class="menu-bar">
+        <div class="menu">
+            <li class="search-box"></li>
+            <ul class="menu-links">
+                <li class="nav-link">
+                    <a href="{{ url_for('admin_dashboard') }}">
+                        <i class='bx bx-home-alt icon'></i>
+                        <span class="text nav-text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-link">
+                    <a href="{{ url_for('specialists') }}">
+                        <i class='bx bx-group icon'></i>
+                        <span class="text nav-text">Specialists</span>
+                    </a>
+                </li>
+                <li class="nav-link">
+                    <a href="{{ url_for('children') }}">
+                        <i class='bx bx-heart icon'></i>
+                        <span class="text nav-text">Children</span>
+                    </a>
+                </li>
+                <li class="nav-link">
+                    <a href="{{ url_for('courses') }}">
+                        <i class='bx bx-book icon'></i>
+                        <span class="text nav-text">Courses</span>
+                    </a>
+                </li>
+                <li class="nav-link">
+                    <a href="{{ url_for('parents') }}">
+                        <i class='bx bx-home-heart icon'></i>
+                        <span class="text nav-text">Parents</span>
+                    </a>
+                </li>
+                <li class="nav-link">
+                    <a href="{{ url_for('organization_statistics') }}">
+                        <i class='bx bx-book-content icon'></i>
+                        <span class="text nav-text">Report</span>
+                    </a>
+                </li>
+                <li class="nav-link">
+                    <a href="{{ url_for('add_parent_and_child') }}">
+                        <i class='bx bx-window-open icon'></i>
+                        <span class="text nav-text">Register</span>
+                    </a>
+                </li>
+                <li class="nav-link">
+                    <a href="{{ url_for('payments') }}">
+                        <i class='bx bx-wallet icon'></i>
+                        <span class="text nav-text">Payments</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="bottom-content">
+            <li>
+                <a href="{{ url_for('logout') }}">
+                    <i class='bx bx-log-out icon'></i>
+                    <span class="text nav-text">Logout</span>
+                </a>
+            </li>
+            <li class="mode">
+                <div class="sun-moon">
+                    <i class='bx bx-moon icon moon'></i>
+                    <i class='bx bx-sun icon sun'></i>
+                </div>
+                <span class="mode-text text">Dark mode</span>
+                <div class="toggle-switch">
+                    <span class="switch"></span>
+                </div>
+            </li>
+        </div>
+    </div>
+</nav>
+<div id="wrapper">
+    <h1>Payments</h1>
+    <div id="search-bar">
+        <input type="text" id="search-input" placeholder="Search by parent name">
+        <button type="button" onclick="searchPayment()">Search</button>
+    </div>
+    <table id="keywords" cellspacing="0" cellpadding="0">
+        <thead>
+            <tr>
+                <th>Amount</th>
+                <th>Payment Date</th>
+                <th>Parent ID</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+                {% for parent_id, payments in payments.items() %}
+                <tr>
+                <td colspan="6">Parent Name: {{ parent_id }}</td>
+                </tr>
+                {% for payment in payments %}
+                <tr id="row-{{ payment['PaymentID'] }}">
+                    <td class="lalign">
+                        <span id="paymentDate-{{ payment['PaymentID'] }}-text">{{ payment['PaymentDate'] }}</span>
+                        <input type="text" name="paymentDate" id="parent_Name-{{ payment['PaymentID'] }}-input" value="{{ payment['PaymentDate'] }}" style="display:none;">
+                    </td>
+                    <td>
+                        <span id="amount-{{ payment['PaymentID'] }}-text">{{ payment['Amount'] }}</span>
+                        <input type="text" name="amount" id="amount-{{ payment['PaymentID'] }}-input" value="{{ payment['Amount'] }}" style="display:none;">
+                    </td>
+                    <td>
+                        <span id="parent_id-{{ payment['PaymentID'] }}-text">{{ payment['Parent_ID'] }}</span>
+                        <input type="text" name="parent_id" id="parent_id-{{ payment['PaymentID'] }}-input" value="{{ payment['Parent_ID'] }}" style="display:none;">
+                    </td>
+                    <td>
+                        <span id="status-{{ payment['PaymentID'] }}-text">{{ payment['PaymentStatus'] }}</span>
+                        <input type="text" name="status" id="status-{{ payment['PaymentID'] }}-input" value="{{ payment['PaymentStatus'] }}" style="display:none;">
+                    </td>
+                    <td>
+                        <button type="button" id="edit-btn-{{ payment['PaymentID'] }}" onclick="enableEdit('{{ payment['PaymentID'] }}')">Edit</button>
+                        <button type="button" id="save-btn-{{ payment['PaymentID'] }}" style="display:none;" onclick="saveEdit('{{ payment['PaymentID'] }}')">Save</button>
+                        <button type="button" id="delete-btn-{{ payment['PaymentID'] }}" onclick="deletePayment('{{ payment['PaymentID'] }}')">Delete</button>
+                    </td>
+                </tr>
+            {% endfor %}
+            {% endfor %}
+        </tbody>
+    </table>
+    <button id="add-btn" onclick="window.location.href='{{ url_for('add_payment') }}'">Add Payment</button>
+</div>
+<script>
+    const body = document.querySelector('body'),
+      sidebar = body.querySelector('nav'),
+      toggle = body.querySelector(".toggle"),
+      searchBtn = body.querySelector(".search-box"),
+      modeSwitch = body.querySelector(".toggle-switch"),
+      modeText = body.querySelector(".mode-text");
+    toggle.addEventListener("click", () => {
+      sidebar.classList.toggle("close");
+    })
+    searchBtn.addEventListener("click", () => {
+      sidebar.classList.remove("close");
+    })
+    modeSwitch.addEventListener("click", () => {
+      body.classList.toggle("dark");
+      if (body.classList.contains("dark")) {
+        modeText.innerText = "Light mode";
+      } else {
+        modeText.innerText = "Dark mode";
+      }
+    });
+  </script>
+</body>
+</html>

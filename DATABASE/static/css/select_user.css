@@ -1,0 +1,45 @@
+body {
+    background-color: orange;
+    font-family: Arial, sans-serif;
+  }
+  
+  .container {
+    margin-top: 100px;
+    text-align: center;
+  }
+  
+  h2 {
+    color: white;
+  }
+  
+  .role-buttons {
+    margin-top: 20px;
+  }
+  
+  .btn {
+    padding: 10px 20px;
+    margin: 0 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    color: white;
+    transition: background-color 0.3s;
+  }
+  
+  .btn.admin {
+    background-color: #FF5733; /* Orange */
+  }
+  
+  .btn.specialist {
+    background-color: #FF5733; /* Orange */
+  }
+  
+  .btn.parent {
+    background-color: #FF5733; /* Orange */
+  }
+  
+  .btn:hover {
+    background-color: #ff8533; /* Lighter shade of orange on hover */
+  }
+  

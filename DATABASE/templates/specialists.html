@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Specialists</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/select.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+    <link href='https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css' rel='stylesheet'>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+         function filterSpecialists() {
+            var course_id = $('#course-select').val();
+            $.ajax({
+                url: '/filter_specialists',
+                type: 'GET',
+                data: { course_id: course_id },
+                success: function(response) {
+                    if (response.success) {
+                        var tableBody = $('#specialists-table tbody');
+                        tableBody.empty();
+                        response.specialists.forEach(function(specialist) {
+                            tableBody.append(`
+                                <tr id="row-${specialist.Specialist_ID}">
+                                    <td><span id="name-${specialist.Specialist_ID}-text">${specialist.Specialist_Name}</span>
+                                    <input type="text" id="name-${specialist.Specialist_ID}-input" value="${specialist.Specialist_Name}" style="display:none;"></td>
+                                    <td>${specialist.SSN}</td>
+                                    <td><span id="salary-${specialist.Specialist_ID}-text">${specialist.Salary}</span>
+                                    <input type="text" id="salary-${specialist.Specialist_ID}-input" value="${specialist.Salary}" style="display:none;"></td>
+                                    <td>
+                                        <button id="edit-btn-${specialist.Specialist_ID}" onclick="enableEdit(${specialist.Specialist_ID})">Edit</button>
+                                        <button id="save-btn-${specialist.Specialist_ID}" style="display:none;" onclick="saveEdit(${specialist.Specialist_ID})">Save</button>
+                                        <button onclick="deleteSpecialist(${specialist.Specialist_ID})">Delete</button>
+                                    </td>
+                                </tr>`);
+                        });
+                    } else {
+                        alert('Error filtering specialists: ' + response.error);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    alert('Error filtering specialists: ' + xhr.responseText);
+                }
+            });
+        }
+        let sortDirection = {
+            Specialist_Name: true,
+            SSN: true,
+            Salary: true
+        };
+
+        function enableEdit(specialist_id) {
+            console.log('Enabling edit for specialist ID:', specialist_id);
+            var row = document.getElementById('row-' + specialist_id);
+            row.classList.add('edit-mode');
+            document.getElementById('name-' + specialist_id + '-text').style.display = 'none';
+            document.getElementById('name-' + specialist_id + '-input').style.display = 'inline';
+            document.getElementById('salary-' + specialist_id + '-text').style.display = 'none';
+            document.getElementById('salary-' + specialist_id + '-input').style.display = 'inline';
+            document.getElementById('save-btn-' + specialist_id).style.display = 'inline';
+            document.getElementById('edit-btn-' + specialist_id).style.display = 'none';
+        }
+
+        function saveEdit(specialist_id) {
+            console.log('Saving edit for specialist ID:', specialist_id);
+            var name = $('#name-' + specialist_id + '-input').val();
+            var salary = $('#salary-' + specialist_id + '-input').val();
+            $.ajax({
+                url: '/update_specialist/' + specialist_id,
+                type: 'POST',
+                data: {
+                    name: name,
+                    salary: salary
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#name-' + specialist_id + '-text').text(name).show();
+                        $('#salary-' + specialist_id + '-text').text(salary).show();
+                        $('#name-' + specialist_id + '-input').hide();
+                        $('#salary-' + specialist_id + '-input').hide();
+                        $('#edit-btn-' + specialist_id).show();
+                        $('#save-btn-' + specialist_id).hide();
+                    } else {
+                        alert('Error updating specialist: ' + response.error);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    alert('Error updating specialist: ' + xhr.responseText);
+                }
+            });
+        }
+
+        function deleteSpecialist(specialist_id) {
+            console.log('Deleting specialist ID:', specialist_id);
+            if (confirm('Are you sure you want to delete this specialist?')) {
+                $.ajax({
+                    url: '/delete_specialist/' + specialist_id,
+                    type: 'POST',
+                    success: function(response) {
+                        if (response.success) {
+                            $('#row-' + specialist_id).remove();
+                        } else {
+                            alert('Error deleting specialist: ' + response.error);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        alert('Error deleting specialist: ' + xhr.responseText);
+                    }
+                });
+            }
+        }
+
+        function searchSpecialists() {
+            console.log('Searching specialists');
+            var query = $('#search-query').val();
+            $.ajax({
+                url: '/search_specialist',
+                type: 'GET',
+                data: { query: query },
+                success: function(response) {
+                    if (response.success) {
+                        var tableBody = $('#specialists-table tbody');
+                        tableBody.empty();
+                        response.specialists.forEach(function(specialist) {
+                            tableBody.append(`
+                                <tr id="row-${specialist.Specialist_ID}">
+                                    <td><span id="name-${specialist.Specialist_ID}-text">${specialist.Specialist_Name}</span>
+                                    <input type="text" id="name-${specialist.Specialist_ID}-input" value="${specialist.Specialist_Name}" style="display:none;"></td>
+                                    <td>${specialist.SSN}</td>
+                                    <td><span id="salary-${specialist.Specialist_ID}-text">${specialist.Salary}</span>
+                                    <input type="text" id="salary-${specialist.Specialist_ID}-input" value="${specialist.Salary}" style="display:none;"></td>
+                                    <td>
+                                        <button id="edit-btn-${specialist.Specialist_ID}" onclick="enableEdit(${specialist.Specialist_ID})">Edit</button>
+                                        <button id="save-btn-${specialist.Specialist_ID}" style="display:none;" onclick="saveEdit(${specialist.Specialist_ID})">Save</button>
+                                        <button onclick="deleteSpecialist(${specialist.Specialist_ID})">Delete</button>
+                                    </td>
+
+                                </tr>`);
+                        });
+                    } else {
+                        alert('Error searching specialists: ' + response.error);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    alert('Error searching specialists: ' + xhr.responseText);
+                }
+            });
+        }
+
+        function sortSpecialists(column) {
+            console.log('Sorting by column:', column);
+            var direction = sortDirection[column] ? 'ASC' : 'DESC';
+            sortDirection[column] = !sortDirection[column];
+            $.ajax({
+                url: '/sort_specialists',
+                type: 'GET',
+                data: {
+                    column: column,
+                    direction: direction
+                },
+                success: function(response) {
+                    if (response.success) {
+                        var tableBody = $('#specialists-table tbody');
+                        tableBody.empty();
+                        response.specialists.forEach(function(specialist) {
+                            tableBody.append(`
+                                <tr id="row-${specialist.Specialist_ID}">
+                                    <td><span id="name-${specialist.Specialist_ID}-text">${specialist.Specialist_Name}</span>
+                                    <input type="text" id="name-${specialist.Specialist_ID}-input" value="${specialist.Specialist_Name}" style="display:none;"></td>
+                                    <td>${specialist.SSN}</td>
+                                    <td><span id="salary-${specialist.Specialist_ID}-text">${specialist.Salary}</span>
+                                    <input type="text" id="salary-${specialist.Specialist_ID}-input" value="${specialist.Salary}" style="display:none;"></td>
+                                    <td>
+                                        <button id="edit-btn-${specialist.Specialist_ID}" onclick="enableEdit(${specialist.Specialist_ID})">Edit</button>
+                                        <button id="save-btn-${specialist.Specialist_ID}" style="display:none;" onclick="saveEdit(${specialist.Specialist_ID})">Save</button>
+                                        <button onclick="deleteSpecialist(${specialist.Specialist_ID})">Delete</button>
+                                    </td>
+                                </tr>`);
+                        });
+                    } else {
+                        alert('Error sorting specialists: ' + response.error);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    alert('Error sorting specialists: ' + xhr.responseText);
+                }
+            });
+        }
+
+        function calculateTotalSalary() {
+            var totalSalary = 0;
+            $('span[id^="salary"]').each(function() {
+                totalSalary += parseFloat($(this).text()) || 0;
+            });
+            $('#total-salary').text('Total Salary: ' + totalSalary);
+        }
+
+    </script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            height: 100vh;
+        }
+        #wrapper {
+            max-width: 800px;
+            width: 100%;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        #search-form {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        #search-query {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px 0 0 5px;
+            font-size: 16px;
+        }
+        #search-query:focus {
+            outline: none;
+        }
+        #search-form button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 0 5px 5px 0;
+        }
+        #course-select {
+            padding: 10px;
+            width: 100%;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+            cursor: pointer;
+            text-align: center;
+        }
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        #total-salary {
+            font-size: 18px;
+            margin-top: 10px;
+            color: #333;
+        }
+        nav {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            background: #333;
+            color: #fff;
+            height: 100vh;
+            padding-top: 20px;
+        }
+        .nav-links {
+            list-style: none;
+            padding: 0;
+        }
+        .nav-links li {
+            padding: 20px;
+            text-align: center;
+        }
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+        }
+        .nav-links a:hover {
+            background: #575757;
+        }
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            width: calc(100% - 250px);
+        }
+        .main-content input {
+            padding: 10px;
+            margin-right: 10px;
+        }
+        .edit, .delete {
+            background-color: #ffcc00;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+        }
+        .edit:hover, .delete:hover {
+            background-color: #ff9900;
+        }
+    </style>
+</head>
+<nav class="sidebar close">
+    <header>
+        <div class="image-text">
+            <span class="image">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
+            </span>
+            <div class="text logo-text">
+                <span class="name">SANAD ORG</span>
+            </div>
+        </div>
+        <i class='bx bx-chevron-right toggle'></i>
+    </header>
+    <div class="menu-bar">
+        <div class="menu">
+            <li class="search-box"></li>
+            <ul class="menu-links">
+                <li class="nav-link">
+                    <a href="{{ url_for('admin_dashboard') }}">
+                        <i class='bx bx-home-alt icon'></i>
+                        <span class="text nav-text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-link">
+                    <a href="{{ url_for('specialists') }}">
+                        <i class='bx bx-group icon'></i>
+                        <span class="text nav-text">Specialists</span>
+                    </a>
+                </li>
+                <li class="nav-link">
+                    <a href="{{ url_for('children') }}">
+                        <i class='bx bx-heart icon'></i>
+                        <span class="text nav-text">Children</span>
+                    </a>
+                </li>
+                <li class="nav-link">
+                    <a href="{{ url_for('courses') }}">
+                        <i class='bx bx-book icon'></i>
+                        <span class="text nav-text">Courses</span>
+                    </a>
+                </li>
+                <li class="nav-link">
+                    <a href="{{ url_for('parents') }}">
+                        <i class='bx bx-home-heart icon'></i>
+                        <span class="text nav-text">Parents</span>
+                    </a>
+                </li>
+                <li class="nav-link">
+                    <a href="{{ url_for('organization_statistics') }}">
+                        <i class='bx bx-book-content icon'></i>
+                        <span class="text nav-text">Report</span>
+                    </a>
+                </li>
+                <li class="nav-link">
+                    <a href="{{ url_for('add_parent_and_child') }}">
+                        <i class='bx bx-window-open icon'></i>
+                        <span class="text nav-text">Register</span>
+                    </a>
+                </li>
+                <li class="nav-link">
+                    <a href="{{ url_for('payments') }}">
+                        <i class='bx bx-wallet icon'></i>
+                        <span class="text nav-text">Payments</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="bottom-content">
+            <li>
+                <a href="{{ url_for('logout') }}">
+                    <i class='bx bx-log-out icon'></i>
+                    <span class="text nav-text">Logout</span>
+                </a>
+            </li>
+            <li class="mode">
+                <div class="sun-moon">
+                    <i class='bx bx-moon icon moon'></i>
+                    <i class='bx bx-sun icon sun'></i>
+                </div>
+                <span class="mode-text text">Dark mode</span>
+                <div class="toggle-switch">
+                    <span class="switch"></span>
+                </div>
+            </li>
+        </div>
+    </div>
+</nav>
+<body>
+<div id="wrapper">
+    <h1>Specialists</h1>
+    <form id="search-form" onsubmit="event.preventDefault(); searchSpecialists();">
+        <input type="text" id="search-query" placeholder="Search specialists...">
+        <button type="submit">Search</button>
+    </form>
+    <select id="course-select" onchange="filterSpecialists()">
+        <option value="">Select a course</option>
+        {% for course in courses %}
+        <option value="{{ course.Course_ID }}">{{ course.Course_Name }}</option>
+        {% endfor %}
+    </select>
+    <table id="specialists-table">
+        <thead>
+            <tr>
+                <th onclick="sortSpecialists('Specialist_Name')">Name</th>
+                <th onclick="sortSpecialists('SSN')">SSN</th>
+                <th onclick="sortSpecialists('Salary')">Salary</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for specialist in specialists %}
+            <tr id="row-{{ specialist.Specialist_ID }}">
+                <td>
+                    <span id="name-{{ specialist.Specialist_ID }}-text">{{ specialist.Specialist_Name }}</span>
+                    <input type="text" id="name-{{ specialist.Specialist_ID }}-input" value="{{ specialist.Specialist_Name }}" style="display:none;">
+                </td>
+                <td>{{ specialist.SSN }}</td>
+                <td>
+                    <span id="salary-{{ specialist.Specialist_ID }}-text">{{ specialist.Salary }}</span>
+                    <input type="text" id="salary-{{ specialist.Specialist_ID }}-input" value="{{ specialist.Salary }}" style="display:none;">
+                </td>
+                <td>
+                    <button id="edit-btn-{{ specialist.Specialist_ID }}" onclick="enableEdit({{ specialist.Specialist_ID }})">Edit</button>
+                    <button id="save-btn-{{ specialist.Specialist_ID }}" style="display:none;" onclick="saveEdit({{ specialist.Specialist_ID }})">Save</button>
+                    <button onclick="deleteSpecialist({{ specialist.Specialist_ID }})">Delete</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="btn-container">
+        <button onclick="window.location.href='{{ url_for('add_specialist') }}'" class="btn">Add Specialist</button>
+
+        <button onclick="calculateTotalSalary()" class="btn">Calculate Total Salary</button>
+    </div>
+    <p id="total-salary">Total Salary: {{ total_salary }}</p>
+</div>
+<script>
+    const body = document.querySelector('body'),
+      sidebar = body.querySelector('nav'),
+      toggle = body.querySelector(".toggle"),
+      searchBtn = body.querySelector(".search-box"),
+      modeSwitch = body.querySelector(".toggle-switch"),
+      modeText = body.querySelector(".mode-text");
+    toggle.addEventListener("click", () => {
+      sidebar.classList.toggle("close");
+    })
+    searchBtn.addEventListener("click", () => {
+      sidebar.classList.remove("close");
+    })
+    modeSwitch.addEventListener("click", () => {
+      body.classList.toggle("dark");
+      if (body.classList.contains("dark")) {
+        modeText.innerText = "Light mode";
+      } else {
+        modeText.innerText = "Dark mode";
+      }
+    });
+  </script>
+</body>
+</html>

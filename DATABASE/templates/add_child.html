@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/ADD.css') }}">
+    <title>Add Child</title>
+
+</head>
+<body>
+<div class="container">
+      <div class="text">
+         Add Child
+      </div>
+    <form method="post">
+         <div class="form-row">
+            <div class="input-data">
+               <input type="text" id="name" name="name" required>
+               <div class="underline"></div>
+               <label for="">Name</label>
+            </div>
+         </div>
+        <div class="form-row">
+            <div class="input-data">
+               <input type="text" id="birthDate" name="birthDate" required>
+               <div class="underline"></div>
+               <label for="">Date of Birth</label>
+            </div>
+         </div>
+         <div class="form-row">
+            <div class="input-data">
+               <input type="text" id="gender" name="gender" required>
+               <div class="underline"></div>
+               <label for="">Gender</label>
+            </div>
+         </div>
+        <div class="form-row">
+            <div class="input-data">
+               <input type="text" id="parent_id" name="parent_id" required>
+               <div class="underline"></div>
+               <label for="">Parent ID</label>
+            </div>
+         </div>
+        <br />
+            <div class="form-row submit-btn">
+               <div class="input-data">
+                  <div class="inner"></div>
+                  <input type="submit" value="ADD">
+               </div>
+            </div>
+    </form>
+
+</div>
+</body>
+</html>

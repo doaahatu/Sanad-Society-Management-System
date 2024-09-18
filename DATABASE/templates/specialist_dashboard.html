@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link href='https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css' rel='stylesheet'>
+  <title>Specialist Profile</title>
+</head>
+<body>
+<nav class="sidebar close">
+  <header>
+    <div class="image-text">
+      <span class="image">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
+      </span>
+      <div class="text logo-text">
+        <span class="name">Hi, {{ specialist.Specialist_Name }}</span>
+        <span class="role">Specialist</span>
+      </div>
+    </div>
+    <i class='bx bx-chevron-right toggle'></i>
+  </header>
+  <div class="menu-bar">
+    <div class="menu">
+      <ul class="menu-links">
+        <li class="nav-link">
+          <a href="{{ url_for('specialist_dashboard') }}">
+            <i class='bx bx-home-alt icon'></i>
+            <span class="text nav-text">Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-link">
+          <a href="{{ url_for('my_supervisions', specialist_id=specialist.Specialist_ID) }}">
+            <i class='bx bx-heart icon'></i>
+            <span class="text nav-text">Supervisions</span>
+          </a>
+        </li>
+        <li class="nav-link">
+            <a href="{{ url_for('todays_schedule', specialist_id=specialist.Specialist_ID) }}">
+              <i class='bx bx-calendar icon'></i>
+              <span class="text nav-text">Today's Schedule</span>
+            </a>
+          </li>
+        <li class="nav-link">
+          <a href="#">
+            <i class='bx bx-bell icon'></i>
+            <span class="text nav-text">Notifications</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+    <div class="bottom-content">
+      <li class="">
+        <a href="{{ url_for('logout') }}">
+          <i class='bx bx-log-out icon'></i>
+          <span class="text nav-text">Logout</span>
+        </a>
+      </li>
+      <li class="mode">
+        <div class="sun-moon">
+          <i class='bx bx-moon icon moon'></i>
+          <i class='bx bx-sun icon sun'></i>
+        </div>
+        <span class="mode-text text">Dark mode</span>
+        <div class="toggle-switch">
+          <span class="switch"></span>
+        </div>
+      </li>
+    </div>
+  </div>
+</nav>
+<main class="cd__main">
+  <div class="profile-page">
+    <div class="content">
+      <div class="content__cover">
+        <div class="content__avatar">
+          <img src="{{ url_for('static', filename='images/specialist_avatar.png') }}" alt="Specialist Avatar">
+        </div>
+        <div class="content__bull"><span></span><span></span><span></span><span></span><span></span></div>
+      </div>
+      <br>
+      <div class="content__title">
+        <h1>{{ specialist.Specialist_Name }}</h1>
+        <span>Specialist</span>
+      </div>
+      <div class="content__description">
+        <p>Email: {{ specialist.Email }}</p>
+      <div class="content__description"> 
+        <h3>Courses Given:</h3>
+        <ul>
+          {% for course in courses %}
+            <ul>{{ course.Course_Name }}</ul>
+          {% endfor %}
+        </ul>
+      </div> 
+      </div>
+      <div class="content__button">
+        <a class="button" href="{{ url_for('my_supervisions', specialist_id=specialist.Specialist_ID) }}">
+          <div class="button__border"></div>
+          <div class="button__bg"></div>
+          <p class="button__text">View My Supervisions</p>
+        </a>
+        <br><br>
+        <a class="button" href="{{ url_for('todays_schedule', specialist_id=specialist.Specialist_ID) }}">
+            <div class="button__border"></div>
+            <div class="button__bg"></div>
+            <p class="button__text">View Today's Schedule</p>
+          </a>
+      </div>
+    </div>
+    <div class="bg">
+      <div><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+    </div>
+  </div>
+</main>
+<script>
+    const body = document.querySelector('body'),
+          sidebar = body.querySelector('nav'),
+          toggle = body.querySelector(".toggle"),
+          modeSwitch = body.querySelector(".toggle-switch"),
+          modeText = body.querySelector(".mode-text");
+
+    toggle.addEventListener("click", () => {
+      sidebar.classList.toggle("close");
+    });
+
+    modeSwitch.addEventListener("click", () => {
+      body.classList.toggle("dark");
+      if (body.classList.contains("dark")) {
+        modeText.innerText = "Light mode";
+      } else {
+        modeText.innerText = "Dark mode";
+      }
+    });
+</script>
+</body>
+</html>

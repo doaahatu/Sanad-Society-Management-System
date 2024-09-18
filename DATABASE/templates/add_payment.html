@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/ADD.css') }}">
+    <title>Add Payment</title>
+</head>
+<body>
+<div class="container">
+    <div class="text">
+        Add Payment
+    </div>
+    <form method="post">
+        <div class="form-row">
+            <div class="input-data">
+                <input type="date" id="paymentDate" name="paymentDate" required>
+                <div class="underline"></div>
+                <label for="">Payment Date</label>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="input-data">
+                <input type="number" id="amount" name="amount" required>
+                <div class="underline"></div>
+                <label for="">Amount</label>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="input-data">
+                <input type="number" id="parent_id" name="parent_id" required>
+                <div class="underline"></div>
+                <label for="">Parent ID</label>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="input-data">
+                <select id="paymentStatus" name="paymentStatus" required>
+                    <option value="Paid">Paid</option>
+                    <option value="Not Yet">Not Yet</option>
+                </select>
+                <div class="underline"></div>
+                <label for="">Payment Status</label>
+            </div>
+        </div>
+        <br />
+        <div class="form-row submit-btn">
+            <div class="input-data">
+                <div class="inner"></div>
+                <input type="submit" value="ADD">
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>

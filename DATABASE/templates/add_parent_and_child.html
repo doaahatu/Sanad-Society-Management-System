@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/ADD.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+    <link href='https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css' rel='stylesheet'>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>Add Parent and Child</title>
+    <style>
+        /* Add your CSS styles here */
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+        }
+        .text {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #f08a24;
+        }
+        h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .form-row {
+            position: relative;
+            margin-bottom: 25px;
+        }
+        .input-data input[type="text"],
+        .input-data input[type="email"],
+        .input-data input[type="date"] {
+            width: 100%;
+            padding: 10px 0;
+            border: none;
+            border-bottom: 2px solid #ccc;
+            background: transparent;
+            outline: none;
+            font-size: 16px;
+            color: #333;
+            transition: all 0.3s ease;
+        }
+        .input-data label {
+            position: absolute;
+            top: 10px;
+            left: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            color: #999;
+        }
+        .input-data input:focus ~ label,
+        .input-data input:not(:placeholder-shown) ~ label {
+            top: -20px;
+            font-size: 14px;
+            color: #f08a24;
+        }
+        .input-data input:focus,
+        .input-data input:not(:placeholder-shown) {
+            border-bottom-color: #f08a24;
+        }
+        .submit-btn {
+            text-align: center;
+        }
+        .submit-btn input[type="submit"] {
+            background: #f08a24;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s ease;
+        }
+        .submit-btn input[type="submit"]:hover {
+            background: #d9781f;
+        }
+        .gender-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        .gender-row label {
+            margin-right: 10px;
+        }
+        .gender-row input[type="radio"] {
+            margin-right: 5px;
+            transform: scale(1.2);
+        }
+        .courses {
+            display: flex;
+            flex-direction: column;
+        }
+        .courses .course-item {
+            margin-bottom: 10px;
+        }
+        .courses .course-item label {
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+<nav class="sidebar close">
+    <header>
+        <div class="image-text">
+            <span class="image">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
+            </span>
+            <div class="text logo-text">
+                <span class="name">SANAD ORG</span>
+            </div>
+        </div>
+        <i class='bx bx-chevron-right toggle'></i>
+    </header>
+    <div class="menu-bar">
+        <div class="menu">
+            <li class="search-box"></li>
+            <ul class="menu-links">
+                <li class="nav-link">
+                    <a href="{{ url_for('admin_dashboard') }}">
+                        <i class='bx bx-home-alt icon'></i>
+                        <span class="text nav-text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-link">
+                    <a href="{{ url_for('specialists') }}">
+                        <i class='bx bx-group icon'></i>
+                        <span class="text nav-text">Specialists</span>
+                    </a>
+                </li>
+                <li class="nav-link">
+                    <a href="{{ url_for('children') }}">
+                        <i class='bx bx-heart icon'></i>
+                        <span class="text nav-text">Children</span>
+                    </a>
+                </li>
+                <li class="nav-link">
+                    <a href="{{ url_for('courses') }}">
+                        <i class='bx bx-book icon'></i>
+                        <span class="text nav-text">Courses</span>
+                    </a>
+                </li>
+                <li class="nav-link">
+                    <a href="{{ url_for('parents') }}">
+                        <i class='bx bx-home-heart icon'></i>
+                        <span class="text nav-text">Parents</span>
+                    </a>
+                </li>
+                <li class="nav-link">
+                    <a href="{{ url_for('organization_statistics') }}">
+                        <i class='bx bx-book-content icon'></i>
+                        <span class="text nav-text">Report</span>
+                    </a>
+                </li>
+                <li class="nav-link">
+                    <a href="{{ url_for('add_parent_and_child') }}">
+                        <i class='bx bx-window-open icon'></i>
+                        <span class="text nav-text">Register</span>
+                    </a>
+                </li>
+                <li class="nav-link">
+                    <a href="{{ url_for('payments') }}">
+                        <i class='bx bx-wallet icon'></i>
+                        <span class="text nav-text">Payments</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="bottom-content">
+            <li>
+                <a href="{{ url_for('logout') }}">
+                    <i class='bx bx-log-out icon'></i>
+                    <span class="text nav-text">Logout</span>
+                </a>
+            </li>
+            <li class="mode">
+                <div class="sun-moon">
+                    <i class='bx bx-moon icon moon'></i>
+                    <i class='bx bx-sun icon sun'></i>
+                </div>
+                <span class="mode-text text">Dark mode</span>
+                <div class="toggle-switch">
+                    <span class="switch"></span>
+                </div>
+            </li>
+        </div>
+    </div>
+</nav>
+<div class="container">
+    <div class="text">Add Parent and Child</div>
+    <form method="post" id="parent-child-form">
+        <h3>Parent Information</h3>
+        <div class="form-row">
+            <div class="input-data">
+                <input type="text" id="name" name="name" required placeholder=" ">
+                <label for="name">Name</label>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="input-data">
+                <input type="text" id="ssn" name="ssn" required placeholder=" ">
+                <label for="ssn">SSN</label>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="input-data">
+                <input type="email" id="email" name="email" required placeholder=" ">
+                <label for="email">Email</label>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="input-data">
+                <input type="text" id="password" name="password" required placeholder=" ">
+                <label for="password">Password</label>
+            </div>
+        </div>
+        
+        <h3>Child Information</h3>
+        <div class="form-row">
+            <div class="input-data">
+                <input type="text" id="child_name" name="child_name" required placeholder=" ">
+                <label for="child_name">Child Name</label>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="input-data">
+                <input type="text" id="birth_date" name="birth_date" onfocus="(this.type='date')" onblur="(this.type='text')" required placeholder=" ">
+                <label for="birth_date">Date of Birth</label>
+            </div>
+        </div>
+        <div class="form-row gender-row">
+            <label>Gender:</label>
+            <input type="radio" id="male" name="gender" value="male" required>
+            <label for="male">Male</label>
+            <input type="radio" id="female" name="gender" value="female" required>
+            <label for="female">Female</label>
+        </div>
+
+        <h3>Course Information</h3>
+        <div class="courses">
+            {% for course in courses %}
+                <div class="course-item">
+                    <input type="checkbox" id="course_{{ course.Course_ID }}" name="course_ids" value="{{ course.Course_ID }}" onchange="toggleSpecialist({{ course.Course_ID }})">
+                    <label for="course_{{ course.Course_ID }}">{{ course.Course_Name }}</label>
+                    <select id="specialist_{{ course.Course_ID }}" name="specialists[{{ course.Course_ID }}]" style="display: none;" onchange="fetchAvailableDates({{ course.Course_ID }})">
+                        <option value="">Select a specialist</option>
+                        {% for specialist in specialists %}
+                            <option value="{{ specialist.id }}">{{ specialist.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <div id="availability_{{ course.Course_ID }}" class="availability-msg" style="display: none;">
+                        <label for="date_{{ course.Course_ID }}">Available Slots:</label>
+                        <select id="date_{{ course.Course_ID }}" name="dates[{{ course.Course_ID }}]"></select>
+                    </div>
+                    <span id="error_{{ course.Course_ID }}" style="color:red; display:none;">Specialist is already reserved.</span>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <br />
+        <div class="form-row submit-btn">
+            <div class="input-data">
+                <div class="inner"></div>
+                <input type="submit" value="ADD">
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+     async function fetchAvailableDates(courseId) {
+    const specialistId = document.getElementById(`specialist_${courseId}`).value;
+    if (specialistId) {
+        const response = await fetch(`/fetch_available_slots?specialist_id=${specialistId}&course_id=${courseId}`);
+        const data = await response.json();
+        const availabilityDiv = document.getElementById(`availability_${courseId}`);
+        const dateSelect = document.getElementById(`date_${courseId}`);
+        if (data.success) {
+            let options = '';
+            for (const slot of data.slots) {
+                options += `<option value="${slot[0]}-${slot[1]}-${slot[2]}">${slot[0]} - ${slot[1]} - ${slot[2]}</option>`;
+            }
+            dateSelect.innerHTML = options;
+            availabilityDiv.style.display = 'block';
+        } else {
+            availabilityDiv.style.display = 'none';
+        }
+    } else {
+        const availabilityDiv = document.getElementById(`availability_${courseId}`);
+        availabilityDiv.style.display = 'none';
+    }
+}
+    function toggleSpecialist(courseId) {
+        const checkbox = document.getElementById(`course_${courseId}`);
+        const select = document.getElementById(`specialist_${courseId}`);
+        const availabilityDiv = document.getElementById(`availability_${courseId}`);
+        if (checkbox.checked) {
+            select.style.display = 'block';
+        } else {
+            select.style.display = 'none';
+            select.value = '';  // Reset the selected value
+            availabilityDiv.style.display = 'none';
+        }
+    }
+
+    document.getElementById('parent-child-form').addEventListener('submit', function(e) {
+        const specialistsSelected = [...document.querySelectorAll('select[name^="specialists"]')].some(select => select.value !== '');
+        if (!specialistsSelected) {
+            e.preventDefault();
+            alert('Please select a specialist for at least one course.');
+        }
+    });
+</script>
+
+
+
+
+<script>
+    const body = document.querySelector('body'),
+      sidebar = body.querySelector('nav'),
+      toggle = body.querySelector(".toggle"),
+      searchBtn = body.querySelector(".search-box"),
+      modeSwitch = body.querySelector(".toggle-switch"),
+      modeText = body.querySelector(".mode-text");
+    toggle.addEventListener("click", () => {
+      sidebar.classList.toggle("close");
+    })
+    searchBtn.addEventListener("click", () => {
+      sidebar.classList.remove("close");
+    })
+    modeSwitch.addEventListener("click", () => {
+      body.classList.toggle("dark");
+      if (body.classList.contains("dark")) {
+        modeText.innerText = "Light mode";
+      } else {
+        modeText.innerText = "Dark mode";
+      }
+    });
+  </script>
+</body>
+</html>

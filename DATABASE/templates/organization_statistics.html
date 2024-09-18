@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organization Statistics</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+    <link href='https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css' rel='stylesheet'>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <style>
+        body {
+            padding: 20px;
+            background-color: #f9f9f9;
+            font-family: 'Times New Roman', Times, serif; /* Set font to Times New Roman */
+        }
+        h1, .card-header {
+            font-weight: bold; /* Bold font for headings */
+        }
+        .card {
+            margin-bottom: 20px;
+        }
+        .card-header {
+            color: #333;
+            background: linear-gradient(to right, #FFA07A, #FF7F50);
+            font-size: 1.1rem; /* Slightly larger font size */
+        }
+        .card-title-orange {
+            color: #FF4500;
+            font-weight: bold;
+        }
+        .table-bordered td, .table-bordered th {
+            border: 1px solid #dee2e6;
+            vertical-align: middle;
+        }
+        .table thead th {
+            background-color: #f8f9fa;
+            color: #333;
+            font-weight: bold; /* Bold font for table headers */
+        }
+        .table tbody td {
+            background-color: #fdf3e7;
+        }
+        p {
+            font-weight: 400; /* Normal weight for paragraph text */
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+<nav class="sidebar close">
+    <header>
+        <div class="image-text">
+            <span class="image">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
+            </span>
+            <div class="text logo-text">
+                <span class="name">SANAD ORG</span>
+            </div>
+        </div>
+        <i class='bx bx-chevron-right toggle'></i>
+    </header>
+    <div class="menu-bar">
+        <div class="menu">
+            <li class="search-box"></li>
+            <ul class="menu-links">
+                <li class="nav-link">
+                    <a href="{{ url_for('admin_dashboard') }}">
+                        <i class='bx bx-home-alt icon'></i>
+                        <span class="text nav-text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-link">
+                    <a href="{{ url_for('specialists') }}">
+                        <i class='bx bx-group icon'></i>
+                        <span class="text nav-text">Specialists</span>
+                    </a>
+                </li>
+                <li class="nav-link">
+                    <a href="{{ url_for('children') }}">
+                        <i class='bx bx-heart icon'></i>
+                        <span class="text nav-text">Children</span>
+                    </a>
+                </li>
+                <li class="nav-link">
+                    <a href="{{ url_for('courses') }}">
+                        <i class='bx bx-book icon'></i>
+                        <span class="text nav-text">Courses</span>
+                    </a>
+                </li>
+                <li class="nav-link">
+                    <a href="{{ url_for('parents') }}">
+                        <i class='bx bx-home-heart icon'></i>
+                        <span class="text nav-text">Parents</span>
+                    </a>
+                </li>
+                <li class="nav-link">
+                    <a href="{{ url_for('organization_statistics') }}">
+                        <i class='bx bx-book-content icon'></i>
+                        <span class="text nav-text">Report</span>
+                    </a>
+                </li>
+                <li class="nav-link">
+                    <a href="{{ url_for('add_parent_and_child') }}">
+                        <i class='bx bx-window-open icon'></i>
+                        <span class="text nav-text">Register</span>
+                    </a>
+                </li>
+                <li class="nav-link">
+                    <a href="{{ url_for('payments') }}">
+                        <i class='bx bx-wallet icon'></i>
+                        <span class="text nav-text">Payments</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="bottom-content">
+            <li>
+                <a href="{{ url_for('logout') }}">
+                    <i class='bx bx-log-out icon'></i>
+                    <span class="text nav-text">Logout</span>
+                </a>
+            </li>
+            <li class="mode">
+                <div class="sun-moon">
+                    <i class='bx bx-moon icon moon'></i>
+                    <i class='bx bx-sun icon sun'></i>
+                </div>
+                <span class="mode-text text">Dark mode</span>
+                <div class="toggle-switch">
+                    <span class="switch"></span>
+                </div>
+            </li>
+        </div>
+    </div>
+</nav>
+    <div class="container">
+        <h1 class="mb-4">Organization Statistics</h1>
+
+        <!-- Total Statistics -->
+        <div class="row">
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-header">Total Profit</div>
+                    <div class="card-body">
+                        <p>{{ total_profit }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-header">Total Children</div>
+                    <div class="card-body">
+                        <p>{{ total_children }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-header">Total Specialists</div>
+                    <div class="card-body">
+                        <p>{{ total_specialists }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-header">Total Courses</div>
+                    <div class="card-body">
+                        <p>{{ total_courses }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Parents who have not paid yet -->
+        <div class="card">
+            <div class="card-header">Parents Who Have Not Paid Yet</div>
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Parent ID</th>
+                            <th>Parent Name</th>
+                            <th>Contact</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for parent in parents_not_paid %}
+                        <tr>
+                            <td>{{ parent.Parent_ID }}</td>
+                            <td>{{ parent.Parent_Name }}</td>
+                            <td>{{ parent.Contact }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Parents with Multiple Children -->
+        <div class="card">
+            <div class="card-header">Parents with Multiple Children</div>
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Parent ID</th>
+                            <th>Parent Name</th>
+                            <th>Number of Children</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for parent in parents_with_multiple_children %}
+                        <tr>
+                            <td>{{ parent.Parent_ID }}</td>
+                            <td>{{ parent.Parent_Name }}</td>
+                            <td>{{ parent.num_children }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Children with Multiple Disabilities or Courses -->
+        <div class="card">
+            <div class="card-header">Children with Multiple Disabilities or Courses</div>
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Child ID</th>
+                            <th>Child Name</th>
+                            <th>Date of Birth</th>
+                            <th>Gender</th>
+                            <th>Parent Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for child in children_multiple_disabilities_courses %}
+                        <tr>
+                            <td>{{ child.Child_ID }}</td>
+                            <td>{{ child.Child_Name }}</td>
+                            <td>{{ child.DateOfBirth }}</td>
+                            <td>{{ child.Gender }}</td>
+                            <td>{{ child.Parent_Name }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Course Count per Specialist -->
+        <div class="card">
+            <div class="card-header">Courses Count per Specialist</div>
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Specialist ID</th>
+                            <th>Specialist Name</th>
+                            <th>Number of Courses</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for specialist in course_count_per_specialist %}
+                        <tr>
+                            <td>{{ specialist.Specialist_ID }}</td>
+                            <td>{{ specialist.Specialist_Name }}</td>
+                            <td>{{ specialist.num_courses }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Total Salary per Specialist -->
+        <div class="card">
+            <div class="card-header">Total Salary per Specialist</div>
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Specialist ID</th>
+                            <th>Specialist Name</th>
+                            <th>Total Salary</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for specialist in total_salary_per_specialist %}
+                        <tr>
+                            <td>{{ specialist.Specialist_ID }}</td>
+                            <td>{{ specialist.Specialist_Name }}</td>
+                            <td>{{ specialist.Salary }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    const body = document.querySelector('body'),
+      sidebar = body.querySelector('nav'),
+      toggle = body.querySelector(".toggle"),
+      searchBtn = body.querySelector(".search-box"),
+      modeSwitch = body.querySelector(".toggle-switch"),
+      modeText = body.querySelector(".mode-text");
+    toggle.addEventListener("click", () => {
+      sidebar.classList.toggle("close");
+    })
+    searchBtn.addEventListener("click", () => {
+      sidebar.classList.remove("close");
+    })
+    modeSwitch.addEventListener("click", () => {
+      body.classList.toggle("dark");
+      if (body.classList.contains("dark")) {
+        modeText.innerText = "Light mode";
+      } else {
+        modeText.innerText = "Dark mode";
+      }
+    });
+  </script>
+</html>
